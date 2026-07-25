@@ -1,0 +1,129 @@
+/* knowledgeTracer viewer */
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+  color: #24292f;
+  background: #fafbfc;
+  line-height: 1.7;
+}
+
+.loading { color: #999; text-align: center; margin-top: 4em; }
+
+/* ---------------- markdown 正文 ---------------- */
+.md-body {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 40px 120px;
+}
+.md-body h1 { font-size: 1.9em; border-bottom: 1px solid #e1e4e8; padding-bottom: .3em; }
+.md-body h2 { font-size: 1.5em; border-bottom: 1px solid #eaecef; padding-bottom: .25em; }
+.md-body h3 { font-size: 1.25em; }
+.md-body h4 { font-size: 1.1em; }
+.md-body h1, .md-body h2, .md-body h3,
+.md-body h4, .md-body h5, .md-body h6 { margin: 1.4em 0 .6em; line-height: 1.35; }
+.md-body p { margin: .8em 0; }
+.md-body a { color: #0366d6; text-decoration: none; }
+.md-body a:hover { text-decoration: underline; }
+.md-body code {
+  background: #eff1f3; border-radius: 4px;
+  padding: .15em .4em; font-size: .88em;
+  font-family: "SF Mono", Consolas, Menlo, monospace;
+}
+.md-body pre {
+  background: #f6f8fa; border: 1px solid #e1e4e8; border-radius: 6px;
+  padding: 12px 14px; overflow-x: auto; position: relative;
+}
+.md-body pre code { background: none; padding: 0; font-size: .85em; line-height: 1.55; }
+.md-body pre .code-lang {
+  position: absolute; top: 4px; right: 10px;
+  font-size: 11px; color: #999; font-family: inherit;
+}
+.md-body blockquote {
+  margin: .8em 0; padding: 2px 14px;
+  border-left: 4px solid #dfe2e5; color: #6a737d;
+}
+.md-body hr { border: none; border-top: 1px solid #e1e4e8; margin: 1.6em 0; }
+.md-body img { max-width: 100%; }
+.md-body table { border-collapse: collapse; margin: .9em 0; }
+.md-body th, .md-body td { border: 1px solid #dfe2e5; padding: 6px 13px; }
+.md-body th { background: #f6f8fa; }
+.md-body tr:nth-child(even) { background: #fafbfc; }
+.md-body del { color: #888; }
+.md-body .md-error {
+  background: #ffeef0; border: 1px solid #f97583; border-radius: 6px;
+  padding: 16px; color: #86181d;
+}
+
+/* KaTeX 公式 */
+.md-body .katex-display {
+  overflow-x: auto; overflow-y: hidden;
+  padding: 6px 0; margin: .4em 0;
+}
+.md-body .katex { font-size: 1.04em; }
+.md-body .math-fallback {
+  background: #fff8e6; border: 1px dashed #d4a72c;
+  border-radius: 4px; padding: .15em .4em; color: #7a5b00;
+}
+.md-body pre.math-fallback { padding: 10px 12px; overflow-x: auto; }
+
+/* ---------------- 浮动图谱面板 ---------------- */
+#panel {
+  position: fixed;
+  top: 16px; right: 16px;
+  width: 360px;
+  background: #fff;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, .14);
+  z-index: 1000;
+  overflow: hidden;
+  user-select: none;
+}
+#panel-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px;
+  background: #f6f8fa;
+  border-bottom: 1px solid #e1e4e8;
+  cursor: grab;
+  font-size: 13px;
+}
+#panel-header:active { cursor: grabbing; }
+#panel-title { font-weight: 600; flex: 1; white-space: nowrap; }
+.hdr-opt {
+  display: flex; align-items: center; gap: 3px;
+  font-size: 12px; color: #57606a; cursor: pointer; white-space: nowrap;
+}
+.hdr-opt input { margin: 0; cursor: pointer; }
+#btn-collapse {
+  border: 1px solid #d0d7de; background: #fff; border-radius: 4px;
+  width: 22px; height: 22px; line-height: 1; cursor: pointer;
+  font-size: 14px; color: #57606a; padding: 0;
+}
+#btn-collapse:hover { background: #f3f4f6; }
+#panel-body { position: relative; }
+#graph {
+  display: block;
+  width: 100%; height: 300px;
+  cursor: default;
+  touch-action: none;
+}
+#panel.collapsed #panel-body { display: none; }
+
+#tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(36, 41, 47, .92);
+  color: #fff; font-size: 12px;
+  padding: 3px 8px; border-radius: 4px;
+  max-width: 260px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  z-index: 10;
+}
+
+@media (max-width: 700px) {
+  #panel { width: 60vw; }
+  .md-body { padding: 20px 18px 120px; }
+}

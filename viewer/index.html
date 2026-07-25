@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>knowledgeTracer</title>
+<link rel="stylesheet" href="/viewer/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="/viewer/style.css">
+</head>
+<body>
+<main id="content" class="md-body"><p class="loading">加载中…</p></main>
+
+<div id="panel">
+  <div id="panel-header" title="拖拽移动面板">
+    <span id="panel-title">知识图谱</span>
+    <label class="hdr-opt" title="显示/隐藏 knowledge_index 首页的连线">
+      <input type="checkbox" id="opt-index-edges" checked>索引连线
+    </label>
+    <label class="hdr-opt" title="只显示当前文档及其直接邻居">
+      <input type="checkbox" id="opt-ego">仅看邻域
+    </label>
+    <button id="btn-collapse" title="折叠/展开">–</button>
+  </div>
+  <div id="panel-body">
+    <canvas id="graph"></canvas>
+    <div id="tooltip" hidden></div>
+  </div>
+</div>
+
+<script src="/viewer/vendor/katex/katex.min.js"></script>
+<script src="/viewer/markdown.js"></script>
+<script src="/viewer/graph.js"></script>
+<script src="/viewer/app.js"></script>
+</body>
+</html>
