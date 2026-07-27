@@ -12,6 +12,7 @@
   var btnCollapse = document.getElementById('btn-collapse');
   var optIndexEdges = document.getElementById('opt-index-edges');
   var optEgo = document.getElementById('opt-ego');
+  var panelResize = document.getElementById('panel-resize');
 
   var currentPath = null;
   var stemMap = {}, baseMap = {}, titleMap = {};   // wikilink 解析表
@@ -129,6 +130,7 @@
     try {
       localStorage.setItem(LS_KEY, JSON.stringify({
         x: panel.style.left || '', y: panel.style.top || '',
+        w: panel.style.width || '', h: panel.style.height || '',
         collapsed: panel.classList.contains('collapsed')
       }));
     } catch (e) { /* 隐私模式下静默 */ }
@@ -140,6 +142,8 @@
       if (!s) return;
       if (s.x) { panel.style.left = s.x; panel.style.right = 'auto'; }
       if (s.y) panel.style.top = s.y;
+      if (s.w) panel.style.width = s.w;
+      if (s.h) panel.style.height = s.h;
       if (s.collapsed) setCollapsed(true);
     } catch (e) { /* ignore */ }
   }
@@ -177,6 +181,39 @@
     }
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
+  });
+
+  /* ---------------- 面板尺寸缩放 ---------------- */
+  panelResize.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    e.stopPropagation();               // 不触发面板拖拽
+    if (panel.classList.contains('collapsed')) return;
+    panelResize.setPointerCapture(e.pointerId);
+    var rect = panel.getBoundingClientRect();
+    var startX = e.clientX, startY = e.clientY;
+    var startW = rect.width, startH = rect.height;
+    // 固定左上角:先锁定 left/top,避免 right 定位导致向左伸展
+    panel.style.left = rect.left + 'px';
+    panel.style.top = rect.top + 'px';
+    panel.style.right = 'auto';
+    var minW = 220, minH = 160;
+    function move(ev) {
+      var maxW = window.innerWidth - rect.left - 4;
+      var maxH = window.innerHeight - rect.top - 4;
+      var w = Math.max(minW, Math.min(startW + (ev.clientX - startX), maxW));
+      var h = Math.max(minH, Math.min(startH + (ev.clientY - startY), maxH));
+      panel.style.width = w + 'px';
+      panel.style.height = h + 'px';
+      graph.resize();
+    }
+    function up() {
+      panelResize.removeEventListener('pointermove', move);
+      panelResize.removeEventListener('pointerup', up);
+      graph.resize();
+      savePanel();
+    }
+    panelResize.addEventListener('pointermove', move);
+    panelResize.addEventListener('pointerup', up);
   });
 
   /* ---------------- 启动 ---------------- */
