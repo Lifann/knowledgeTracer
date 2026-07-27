@@ -13,6 +13,8 @@
   var optIndexEdges = document.getElementById('opt-index-edges');
   var optEgo = document.getElementById('opt-ego');
   var panelResize = document.getElementById('panel-resize');
+  var toc = document.getElementById('toc');
+  var tocList = document.getElementById('toc-list');
 
   var currentPath = null;
   var stemMap = {}, baseMap = {}, titleMap = {};   // wikilink 解析表
@@ -91,7 +93,67 @@
         }
       }
     }
-    if (el) el.scrollIntoView({ block: 'start' });
+    if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }
+
+  /* ---------------- 目录(TOC) ---------------- */
+  var spyObserver = null;
+  var tocLinkById = {};   // heading id -> <a>
+
+  function buildToc() {
+    tocList.innerHTML = '';
+    tocLinkById = {};
+    var heads = content.querySelectorAll('h1,h2,h3,h4,h5,h6');
+    var count = 0;
+    for (var i = 0; i < heads.length; i++) {
+      var hEl = heads[i];
+      var text = (hEl.textContent || '').trim();
+      if (!text || !hEl.id) continue;
+      var lv = +hEl.tagName.slice(1);
+      var li = document.createElement('li');
+      var a = document.createElement('a');
+      a.className = 'toc-link toc-h' + lv;
+      a.textContent = text;                  // textContent:不注入 HTML
+      a.title = text;
+      a.href = '#/' + encodeURI(currentPath) + '#' + encodeURIComponent(hEl.id);
+      li.appendChild(a);
+      tocList.appendChild(li);
+      tocLinkById[hEl.id] = a;
+      count++;
+    }
+    var empty = count === 0;
+    toc.classList.toggle('empty', empty);
+    document.body.classList.toggle('no-toc', empty);
+    setupScrollSpy(empty ? [] : heads);
+  }
+
+  function setActive(id) {
+    for (var k in tocLinkById) {
+      if (tocLinkById.hasOwnProperty(k)) tocLinkById[k].classList.remove('active');
+    }
+    var a = tocLinkById[id];
+    if (a) { a.classList.add('active'); a.scrollIntoView({ block: 'nearest' }); }
+  }
+
+  function setupScrollSpy(heads) {
+    if (spyObserver) { spyObserver.disconnect(); spyObserver = null; }
+    if (!window.IntersectionObserver || !heads.length) return;
+    var visible = {};
+    spyObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) visible[en.target.id] = true;
+        else delete visible[en.target.id];
+      });
+      // 取当前可见标题中文档顺序最靠前者作为「当前章节」
+      var chosen = null;
+      for (var i = 0; i < heads.length; i++) {
+        if (visible[heads[i].id]) { chosen = heads[i].id; break; }
+      }
+      if (chosen) setActive(chosen);
+    }, { root: null, rootMargin: '0px 0px -70% 0px', threshold: 0 });
+    for (var i = 0; i < heads.length; i++) {
+      if (heads[i].id) spyObserver.observe(heads[i]);
+    }
   }
 
   function load() {
@@ -109,6 +171,7 @@
         currentPath = d.path;
         content.innerHTML = window.MD.render(d.content, d.path, resolveWiki);
         document.title = d.title + ' - knowledgeTracer';
+        buildToc();
         graph.setCurrent(d.path);
         graph.focus(d.path);
         scrollToAnchor(route.anchor);
@@ -118,6 +181,7 @@
           route.path.replace(/</g, '&lt;') + '</b><br>' +
           (err.message || '').replace(/</g, '&lt;') +
           '<br><a href="#/' + encodeURI(DEFAULT_PAGE) + '">返回首页</a></div>';
+        buildToc();
       });
   }
 

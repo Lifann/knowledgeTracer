@@ -8,9 +8,53 @@ body {
   color: #24292f;
   background: #fafbfc;
   line-height: 1.7;
+  padding-left: 260px;               /* 为左侧 TOC 侧栏让位 */
 }
+body.no-toc { padding-left: 0; }     /* 无标题文档:收回让位 */
 
 .loading { color: #999; text-align: center; margin-top: 4em; }
+
+/* ---------------- 左侧目录(TOC)侧栏 ---------------- */
+#toc {
+  position: fixed;
+  top: 0; left: 0;
+  width: 260px; height: 100vh;
+  overflow-y: auto;
+  padding: 16px 12px 40px;
+  background: #f6f8fa;
+  border-right: 1px solid #e1e4e8;
+  z-index: 900;
+  font-size: 13px;
+  line-height: 1.5;
+}
+#toc.empty { display: none; }
+#toc-title {
+  font-weight: 600; font-size: 12px; letter-spacing: .04em;
+  color: #57606a; text-transform: uppercase;
+  padding: 0 6px 8px; margin-bottom: 6px;
+  border-bottom: 1px solid #e1e4e8;
+}
+#toc-list { list-style: none; margin: 0; padding: 0; }
+#toc-list li { margin: 0; }
+.toc-link {
+  display: block;
+  padding: 3px 6px 3px 8px;
+  color: #57606a; text-decoration: none;
+  border-left: 2px solid transparent;
+  border-radius: 0 4px 4px 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.toc-link:hover { color: #24292f; background: #eaeef2; }
+.toc-link.active {
+  color: #0366d6; font-weight: 600;
+  border-left-color: #0366d6; background: #eaf1fb;
+}
+.toc-h1 { padding-left: 8px; }
+.toc-h2 { padding-left: 22px; }
+.toc-h3 { padding-left: 36px; }
+.toc-h4 { padding-left: 50px; }
+.toc-h5 { padding-left: 64px; }
+.toc-h6 { padding-left: 78px; }
 
 /* ---------------- markdown 正文 ---------------- */
 .md-body {
@@ -140,6 +184,10 @@ body {
   z-index: 10;
 }
 
+@media (max-width: 900px) {
+  #toc { display: none; }
+  body { padding-left: 0; }
+}
 @media (max-width: 700px) {
   #panel { width: 60vw; }
   .md-body { padding: 20px 18px 120px; }
